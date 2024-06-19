@@ -2,63 +2,114 @@ name: Build and release
 on: [push, pull_request]
 
 jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
 
-  publish_on_mac:
-    runs-on: macos-latest
     steps:
-    - uses: actions/checkout@v2       
-    - uses: actions/setup-node@master
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Set up Node.js (example for a Node.js project)
+      uses: actions/setup-node@v3
       with:
-        node-version: 21
-    - name: install dependencies
+        node-version: '21'
+
+    - name: Install dependencies
       run: npm install --legacy-peer-deps
-    - name: build
+
+    - name: Build project
       run: npm run build
       env:
-         NEXT_PUBLIC_PRIVY_APP_ID: ${{ secrets.NEXT_PUBLIC_PRIVY_APP_ID }}
-    - name: package
+        NEXT_PUBLIC_PRIVY_APP_ID: ${{ secrets.NEXT_PUBLIC_PRIVY_APP_ID }}
+    - name: Package
       run: npm run package
-    - name: cek
-      run: ls dist
-    # - name: Delete drafts
-    #   uses: hugo19941994/delete-draft-releases@v0.1.0
-    #   env:
-    #       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    # - uses: dev-drprasad/delete-tag-and-release@v0.1.2
-    #   with:
-    #     delete_release: true # default: false
-    #     tag_name: linux # tag name to delete
-    #   env:
-    #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  
-
-  # publish_on_mac:
-  #   runs-on: macos-latest
-  #   steps:
-  #   - uses: actions/checkout@v2
-  #   - uses: actions/setup-node@master
-  #     with:
-  #       node-version: 21
-  #   - name: install dependencies
-  #     run: npm install
-  #   - name: build
-  #     run: npm run build
-  #   - name: publish
-  #     env:
-  #       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  #     run: npm run publish
       
-  # publish_on_win:
-  #   runs-on: windows-latest
-  #   steps:
-  #   - uses: actions/checkout@v2       
-  #   - uses: actions/setup-node@master
-  #     with:
-  #       node-version: 21
-  #   - name: install dependencies
-  #     run: npm install
-  #   - name: build
-  #     run: npm run build
-  #   - name: publish
-  #     env:
-  #       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  #     run: npm run publish
+    - name: Archive build files
+      if: runner.os == 'Linux'
+      run: zip -r build-linux.zip ./dist
+
+    - name: Archive build files
+      if: runner.os == 'Windows'
+      run: Compress-Archive -Path .\dist\* -DestinationPath build-windows.zip
+
+    - name: Archive build files
+      if: runner.os == 'macOS'
+      run: zip -r build-macos.zip ./dist
+
+    - name: Upload build artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: build-${{ matrix.os }}
+        path: build-*.zip
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Download build artifacts
+      uses: actions/download-artifact@v3
+      with:
+        name: build-ubuntu-latest
+        path: ./builds
+
+    - name: Download build artifacts
+      uses: actions/download-artifact@v3
+      with:
+        name: build-windows-latest
+        path: ./builds
+
+    - name: Download build artifacts
+      uses: actions/download-artifact@v3
+      with:
+        name: build-macos-latest
+        path: ./builds
+
+    - name: Create GitHub Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ github.ref }}
+        release_name: Release ${{ github.ref }}
+        body: |
+          Release notes for ${{ github.ref }}
+        draft: false
+        prerelease: false
+
+    - name: Upload Linux build asset
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./builds/build-linux.zip
+        asset_name: build-linux.zip
+        asset_content_type: application/zip
+
+    - name: Upload Windows build asset
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./builds/build-windows.zip
+        asset_name: build-windows.zip
+        asset_content_type: application/zip
+
+    - name: Upload macOS build asset
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./builds/build-macos.zip
+        asset_name: build-macos.zip
+        asset_content_type: application/zip
