@@ -2,10 +2,14 @@
 
 ## Description
 
-Farcaster Casting Only Electron App is a custom-built desktop application designed for casting content to Farcaster. It leverages the power of Next.js, Typescript, and Tailwind to provide a seamless user experience.
+Farcaster Casting Only Electron App is a custom-built desktop application designed for casting content to Farcaster. It can cast to farcaster directly using privy and neynar.
 
 <p align="center"><img src="https://github.com/ntlind/electron-nextjs-starter/blob/main/renderer/public/images/screenshot.png?raw=true"></p>
 
+# Features
+
+- Casting to farcaster
+- Casting to multiple channel or cast id at the same time
 
 ## Usage
 
