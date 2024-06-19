@@ -29,14 +29,14 @@ export default function FarcasterPage() {
 	};
 	const router = useRouter()
 	const [hubUrl, setHubUrl] = useState('https://hub-api.neynar.com');
-	const [neynarApiKey, setNeynarApiKey] = useState(null);
+	const [neynarApiKey, setNeynarApiKey] = useState("");
 	async function openInBrowser(url: string) {
 		toast("opening in your browser please wait...", { autoClose: 1000 })
 		require("electron").shell.openExternal(url);
 
 	}
 	useEffect(()=>{
-		setHubUrl(readLocalStorage("HUB_URL"))
+		setHubUrl(readLocalStorage("HUB_URL") || 'https://hub-api.neynar.com')
 		setNeynarApiKey(readLocalStorage("NEYNAR_API_KEY"))
 	},[])
 	const [castInput, setCastInput] = useState('');
@@ -80,8 +80,8 @@ export default function FarcasterPage() {
 
 	const { logout } = useLogout({
 		onSuccess: () => {
-			saveToLocalStorage("HUB_URL",null)
-			saveToLocalStorage("NEYNAR_API_KEY",null);
+			saveToLocalStorage("HUB_URL","")
+			saveToLocalStorage("NEYNAR_API_KEY","");
 			console.log('🫥 ✅ logOut onSuccess')
 			router.push('/')
 		},
@@ -339,7 +339,7 @@ export default function FarcasterPage() {
 				<div className='flex flex-wrap gap-4'>
 					{!signerPublicKey && (
 						<button
-							className='mt-4 rounded-md bg-violet-600 px-4 py-2 text-sm text-white hover:bg-violet-700'
+							className={`mt-4 rounded-md bg-violet-600 px-4 py-2 text-sm text-white hover:bg-violet-700 ${neynarApiKey.length === 0  ? "hidden" : ""}`}
 							onClick={requestFarcasterSignerFromWarpcast}
 							disabled={!!signerPublicKey}
 						>
@@ -347,8 +347,8 @@ export default function FarcasterPage() {
 						</button>
 					)}
 				</div>
-				<div className={`flex justify-center mt-4 ${neynarApiKey !== null ? "hidden" : ""}`}>please put neynar api key on <span className="text-blue-600 cursor-pointer mx-1" onClick={() => router.push("/setting")}>setting</span> to submit cast</div>
-				{neynarApiKey !== null && <>
+				<div className={`flex justify-center mt-4 ${neynarApiKey.length !== 0  ? "hidden" : ""}`}>please put neynar api key on <span className="text-blue-600 cursor-pointer mx-1" onClick={() => router.push("/setting")}>setting</span> to submit cast</div>
+				{(neynarApiKey.length !== 0 && signerPublicKey) && <>
 					<p className='mb-2 mt-6 text-sm font-bold uppercase text-gray-600'>
 						Submit a cast
 					</p>

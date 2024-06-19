@@ -19,17 +19,17 @@ export default function FarcasterPage() {
 	
 	const router = useRouter()
 	const [hubUrl, setHubUrl] = useState('https://hub-api.neynar.com');
-	const [neynarApiKey, setNeynarApiKey] = useState(null);
+	const [neynarApiKey, setNeynarApiKey] = useState("");
 	const { logout } = useLogout({
 		onSuccess: () => {
 			console.log('🫥 ✅ logOut onSuccess')
-			saveToLocalStorage("HUB_URL",null)
-			saveToLocalStorage("NEYNAR_API_KEY",null);
+			saveToLocalStorage("HUB_URL","")
+			saveToLocalStorage("NEYNAR_API_KEY","");
 			router.push('/')
 		},
 	})
 	useEffect(()=>{
-		setHubUrl(readLocalStorage("HUB_URL"))
+		setHubUrl(readLocalStorage("HUB_URL") || 'https://hub-api.neynar.com')
 		setNeynarApiKey(readLocalStorage("NEYNAR_API_KEY"))
 	},[])
 
