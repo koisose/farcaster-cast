@@ -70,9 +70,12 @@ jobs:
       with:
         name: build-macos-latest
         path: ./builds
-    - name: Extract tag name
-      id: extract_tag
-      run: echo "TAG_NAME=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
+    - name: Generate random tag name
+      id: generate_tag
+      run: |
+        TAG_NAME=$(date +'%Y%m%d%H%M%S')-$(openssl rand -hex 3)
+        echo "TAG_NAME=${TAG_NAME}" >> $GITHUB_ENV
+        
     - name: Create GitHub Release
       id: create_release
       uses: actions/create-release@v1
