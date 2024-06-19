@@ -1,0 +1,12 @@
+appId: lol.koisose.farcaster-cast
+productName: farcaster-cast
+copyright: Copyright © 2024 koisose
+directories:
+  output: dist
+  buildResources: resources
+files:
+  - from: .
+    filter:
+      - package.json
+      - app
+publish: null
