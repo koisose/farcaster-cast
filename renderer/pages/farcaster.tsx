@@ -434,7 +434,7 @@ export default function FarcasterPage() {
 							</p>
 							<p className='mt-1 text-sm text-gray-600'>
 								mentioned user:{preview.mentionsUsername.map((value, index) => <span key={index} className='mt-1 mx-1 inline-flex items-center bg-orange-100 text-orange-800 text-sm font-semibold px-3 py-1 rounded dark:bg-orange-200 dark:text-orange-900'>
-									<span onClick={() => openInBrowser(`https://warpcast.com/${value}`)} className='hover:underline cursor-pointer'>{value}</span>
+									<span onClick={() => openInBrowser(`https://warpcast.com/${value.replace("@","")}`)} className='hover:underline cursor-pointer'>{value}</span>
 								</span>)}
 							</p>
 							<p className='mt-1 text-sm text-gray-600'>
