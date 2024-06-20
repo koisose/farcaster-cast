@@ -7,6 +7,9 @@ Farcaster Casting Only Electron App is a custom-built desktop application design
 ![image](https://github.com/koisose/farcaster-cast/assets/17805677/5b60d018-4b87-4548-a824-7c1e74cb08cc)
 
 
+# Demo
+
+https://www.youtube.com/watch?v=DqjA8gQ7jhA
 
 # Features
 
