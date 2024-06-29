@@ -1,8 +1,11 @@
 import axios from 'axios'
 
-
+const readLocalStorage = (key) => {
+    const value = localStorage.getItem(key);
+    return value;
+};
 async function checkUsername(username: string) {
-
+    
     try {
         const usernameFid = await axios.get('https://api.neynar.com/v2/farcaster/user/search', {
             params: {
@@ -11,7 +14,7 @@ async function checkUsername(username: string) {
             },
             headers: {
                 accept: 'application/json',
-                api_key: 'NEYNAR_API_DOCS'
+                api_key: readLocalStorage("NEYNAR_API_KEY")
             }
         })
         if (usernameFid.data.result.users.length > 0) {
